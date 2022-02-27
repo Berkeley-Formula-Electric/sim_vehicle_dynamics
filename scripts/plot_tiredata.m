@@ -2,7 +2,7 @@ close all
 clear filepath_tireparams
 %% USER INPUT
 
-    vehicle = 'il';
+    vehicle = 'pa';
 
     % input for variable steps
     SR_steps = -0.5 : 0.01 : 0.5;                                               % []q
@@ -43,7 +43,7 @@ clear filepath_tireparams
         filepath_tireparams_front = filepath_tireparams{2};
         filepath_tireparams_rear = filepath_tireparams{3};
 
-    elseif ~isfile(filepath_tireparams(1:4)) && all(isfile(filepath_tireparams(4:end)))
+    elseif ~all(isfile(filepath_tireparams(1:4))) && all(isfile(filepath_tireparams(4:end)))
         filepath_tireparams_front = filepath_tireparams{4};
         filepath_tireparams_rear = filepath_tireparams{6};
 

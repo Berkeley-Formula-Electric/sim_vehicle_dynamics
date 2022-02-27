@@ -4,6 +4,15 @@ close all;
 clearvars -except SimRealState input debug logsout
 
 %% User Input
+rr = [5000 2400]; % roll rate fr re (Nm/rad)
+fc = 0.5; % distance from front axle to COG (m)
+rc = 0.5; % distance from rear axle to COG (m)
+l = 1; % wheelbase (m)
+g=9.81; % accel due to gravity (m/s^2)
+W=300*g; % mass of vehicle (N)
+t=1.4; % track width (m)
+hz=0.5; % COG z height (m)
+
 
 %% data source
 
@@ -49,6 +58,8 @@ if i_datasource == 1
     VehicleData.ax_mps2 = dummy.ax_mps2;
     VehicleData.ay_mps2 = dummy.ay_mps2;
 
+    VehicleData.phi_rad = dummy.phi_rad;
+    
 elseif i_datasource == 2
         
     % from script which loads data for simulink replay
@@ -89,6 +100,9 @@ end
 
     ax_mps2 = VehicleData.ax_mps2.Data((t_start/sim_timestep)+1:i:end);
     ay_mps2 = VehicleData.ay_mps2.Data((t_start/sim_timestep)+1:i:end);
+    
+    phi_rad = VehicleData.phi_rad.Data((t_start/sim_timestep)+1:i:end);
+    
 
     % calculate tangent to vehicle's CoG path
     diff_x_m = diff(x_m);
@@ -137,6 +151,22 @@ fig1 = figure;
     
     legend('ax','ay')
     
+% subplot 6 (bottom right)
+    sp6 = subplot(3,2,6);
+    title('Normal Force on each wheel')
+  	grid on
+    
+    h61 = animatedline('Color',	[0, 0.4470, 0.7410]); %fr
+    h62 = animatedline('Color',	[0.8500, 0.3250, 0.0980]); %fl
+    h63 = animatedline('Color',	[1, 0, 1]); %rr
+    h64 = animatedline('Color', [0, 0, 1]); %rl
+    h65 = animatedline('Color', [0, 1, 1]); %sum
+    
+    xlabel('time in s')
+    ylabel('normal force in N')
+    
+    legend('Front Right', 'Front Left', 'Rear Right', 'Rear Left', 'sanity check')
+    
     
 % subplot 5 (bottom left)
     sp5 = subplot(3,2,5);
@@ -157,7 +187,7 @@ fig1 = figure;
     
     
 % subplot right side (subplot no. 2,4,6)
-    sp246 = subplot(3,2,[2 4 6]);
+    sp24 = subplot(3,2,[2 4]);
     title('vehicle location - local')
 
     xlabel('x-coordinate in m')
@@ -168,7 +198,7 @@ fig1 = figure;
     hold on 
     axis equal
 
-    h246 = animatedline;
+    h24 = animatedline;
 
     plot(x_m(1),y_m(1),'+')
 
@@ -194,6 +224,7 @@ fig1 = figure;
     h(2) = plot(0,0,'k');
     legend([h(1) h(2)], {'vehicle heading',"tangent to vehicle's CoG path"});
 
+    
 % for loop which updates every subplot
 for timestep=1:size(time,1)-1
 
@@ -214,13 +245,30 @@ for timestep=1:size(time,1)-1
   	addpoints(h31,time(timestep), ax_mps2(timestep));
   	addpoints(h32,time(timestep), ay_mps2(timestep));
 
+    % update subplot 6
+    sp6;
+    
+    % front right
+    addpoints(h61,time(timestep), W/4+(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g));
+    % front left
+    addpoints(h62,time(timestep), W/4-(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g));
+    % rear right
+    addpoints(h63,time(timestep), W/4+(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g));
+    % rear left
+    addpoints(h64,time(timestep), W/4-(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g));
+    % sum
+    addpoints(h65, time(timestep), W-(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g) ...
+        +(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g)...
+        -(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g)...
+        +(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g))
+    
     % update subplot 5
     sp5;
     
     addpoints(h5,x_m(timestep), y_m(timestep));
     
-    % update subplot 246
-  	sp246;
+    % update subplot 24
+  	sp24;
     
     xlim([x_m(timestep)-50,x_m(timestep)+50])
     ylim([y_m(timestep)-50,y_m(timestep)+50])
@@ -230,7 +278,9 @@ for timestep=1:size(time,1)-1
 
     set(g_traj_tangent,'Matrix',trans*rotz_tangent)
 
-    addpoints(h246,x_m(timestep), y_m(timestep));
+    addpoints(h24,x_m(timestep), y_m(timestep));
+    
+    
     
     % update plot
     drawnow
