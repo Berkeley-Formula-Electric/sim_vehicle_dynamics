@@ -160,12 +160,11 @@ fig1 = figure;
     h62 = animatedline('Color',	[0.8500, 0.3250, 0.0980]); %fl
     h63 = animatedline('Color',	[1, 0, 1]); %rr
     h64 = animatedline('Color', [0, 0, 1]); %rl
-    h65 = animatedline('Color', [0, 1, 1]); %sum
     
     xlabel('time in s')
     ylabel('normal force in N')
     
-    legend('Front Right', 'Front Left', 'Rear Right', 'Rear Left', 'sanity check')
+    legend('Front Right', 'Front Left', 'Rear Right', 'Rear Left')
     
     
 % subplot 5 (bottom left)
@@ -256,12 +255,6 @@ for timestep=1:size(time,1)-1
     addpoints(h63,time(timestep), W/4+(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g));
     % rear left
     addpoints(h64,time(timestep), W/4-(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g));
-    % sum
-    addpoints(h65, time(timestep), W-(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g) ...
-        +(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(1)+W*hz*(fc)/l)/(rr(1)+rr(2)-W*hz))-ax_mps2(timestep)*W/(2*l*g)...
-        -(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g)...
-        +(ay_mps2(timestep)*W/(g*2*t))*hz*((rr(2)+W*hz*(rc)/l)/(rr(1)+rr(2)-W*hz))+ax_mps2(timestep)*W/(2*l*g))
-    
     % update subplot 5
     sp5;
     
