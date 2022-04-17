@@ -1,3 +1,3 @@
 Type = ["Straight", "Left", "Straight","Right", "Straight", "Right", "Straight", "Right", "Straight"];
-Length = [30, 10*pi(), 30, 10*pi(), 60, 10*pi(), 30, pi()*10, 30];
-Radius = [0, 10, 0,10,0, 10, 0, 10, 0];
+Length = [30, 25*pi(), 30, 25*pi(), 60, 25*pi()/2, 60, pi()*25/2, 30];
+Radius = [0, 25, 0,25,0, 25, 0, 25, 0];
