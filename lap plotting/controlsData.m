@@ -7,7 +7,7 @@ output = [0,0];
 t = [5];
 ang = [];
 % velocity (m/s)
-v = 15;
+v = 10;
 
 %% loop through each section of lap
 for n=1:1:nPoints
