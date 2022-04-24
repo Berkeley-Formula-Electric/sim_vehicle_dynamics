@@ -1,7 +1,7 @@
 %% reset system, initialize track points, see file for layout
 clear;
 clc;
-trackData;
+trackDataSimple;
 nPoints = max(size(Length));
 x0=0;x1=0;y0=0;y1=0;angle=0;
 X = [0];

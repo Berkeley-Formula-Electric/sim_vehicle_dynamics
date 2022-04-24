@@ -281,3 +281,4 @@ for timestep=1:size(time,1)-1
     pause((sim_timestep*i)/replay_speed_factor)
     
 end
+hold off
